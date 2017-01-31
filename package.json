@@ -20,7 +20,7 @@
     "meetings"
   ],
   "author": "timezone@trunat.fr",
-  "license": "MIT",
+  "license": "Apache 2",
   "bugs": {
     "url": "https://github.com/imt-timezone-project/timezone-manager/issues"
   },
