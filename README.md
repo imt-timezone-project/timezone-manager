@@ -5,3 +5,5 @@ time for your meeting while having participants all around the globe.
 
 It is often the case in team working remotely across different
 countries.
+
+[You can try it there!](https://imt-timezone-project.github.io/timezone-manager/)
