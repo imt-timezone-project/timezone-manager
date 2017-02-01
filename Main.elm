@@ -4,4 +4,4 @@ import Html
 
 
 main =
-    Html.text "Hello world!"
+    Html.text "Hello IMT!"
