@@ -8760,6 +8760,121 @@ var _elm_lang$html$Html_Attributes$classList = function (list) {
 };
 var _elm_lang$html$Html_Attributes$style = _elm_lang$virtual_dom$VirtualDom$style;
 
+var _elm_lang$html$Html_Events$keyCode = A2(_elm_lang$core$Json_Decode$field, 'keyCode', _elm_lang$core$Json_Decode$int);
+var _elm_lang$html$Html_Events$targetChecked = A2(
+	_elm_lang$core$Json_Decode$at,
+	{
+		ctor: '::',
+		_0: 'target',
+		_1: {
+			ctor: '::',
+			_0: 'checked',
+			_1: {ctor: '[]'}
+		}
+	},
+	_elm_lang$core$Json_Decode$bool);
+var _elm_lang$html$Html_Events$targetValue = A2(
+	_elm_lang$core$Json_Decode$at,
+	{
+		ctor: '::',
+		_0: 'target',
+		_1: {
+			ctor: '::',
+			_0: 'value',
+			_1: {ctor: '[]'}
+		}
+	},
+	_elm_lang$core$Json_Decode$string);
+var _elm_lang$html$Html_Events$defaultOptions = _elm_lang$virtual_dom$VirtualDom$defaultOptions;
+var _elm_lang$html$Html_Events$onWithOptions = _elm_lang$virtual_dom$VirtualDom$onWithOptions;
+var _elm_lang$html$Html_Events$on = _elm_lang$virtual_dom$VirtualDom$on;
+var _elm_lang$html$Html_Events$onFocus = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'focus',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onBlur = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'blur',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onSubmitOptions = _elm_lang$core$Native_Utils.update(
+	_elm_lang$html$Html_Events$defaultOptions,
+	{preventDefault: true});
+var _elm_lang$html$Html_Events$onSubmit = function (msg) {
+	return A3(
+		_elm_lang$html$Html_Events$onWithOptions,
+		'submit',
+		_elm_lang$html$Html_Events$onSubmitOptions,
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onCheck = function (tagger) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'change',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetChecked));
+};
+var _elm_lang$html$Html_Events$onInput = function (tagger) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'input',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetValue));
+};
+var _elm_lang$html$Html_Events$onMouseOut = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseout',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseOver = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseover',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseLeave = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseleave',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseEnter = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseenter',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseUp = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseup',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseDown = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mousedown',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onDoubleClick = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'dblclick',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onClick = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'click',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$Options = F2(
+	function (a, b) {
+		return {stopPropagation: a, preventDefault: b};
+	});
+
 var _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerSecond = 1000;
 var _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerMinute = 60 * _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerSecond;
 var _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerHour = 60 * _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerMinute;
@@ -10482,11 +10597,41 @@ var _user$project$Utils$timeIn = F2(
 		return (_elm_lang$core$Native_Utils.cmp(seconds, 10) < 0) ? 'in a few seconds' : ((_elm_lang$core$Native_Utils.cmp(seconds, 55) < 0) ? A2(_user$project$Utils$plural, 'second', seconds) : (A3(_user$project$Utils$within, 55, 65, seconds) ? 'in about a minute' : ((_elm_lang$core$Native_Utils.cmp(minutes, 55) < 0) ? A2(_user$project$Utils$plural, 'minute', minutes) : (A3(_user$project$Utils$within, 55, 65, minutes) ? 'in about an hour' : ((_elm_lang$core$Native_Utils.cmp(hours, 22) < 0) ? A2(_user$project$Utils$plural, 'hour', hours) : (A3(_user$project$Utils$within, 22, 26, hours) ? 'in about a day' : (A3(_user$project$Utils$within, 6, 8, days) ? 'in about a week' : (A3(_user$project$Utils$within, 14, 16, days) ? 'in about 2 weeks' : (A3(_user$project$Utils$within, 20, 22, days) ? 'in about 3 weeks' : ((_elm_lang$core$Native_Utils.cmp(days, 27) < 0) ? A2(_user$project$Utils$plural, 'day', days) : (A3(_user$project$Utils$within, 27, 33, days) ? 'in about a month' : ((_elm_lang$core$Native_Utils.cmp(months, 11) < 0) ? A2(_user$project$Utils$plural, 'month', months) : (A3(_user$project$Utils$within, 11, 13, months) ? 'in about a year' : A2(_user$project$Utils$plural, 'year', years))))))))))))));
 	});
 
+var _user$project$Main$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		if (_p0.ctor === 'Tick') {
+			return A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				_elm_lang$core$Native_Utils.update(
+					model,
+					{currentTime: _p0._0}),
+				{ctor: '[]'});
+		} else {
+			return A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				_elm_lang$core$Native_Utils.update(
+					model,
+					{isoDate: _p0._0}),
+				{ctor: '[]'});
+		}
+	});
+var _user$project$Main$Model = F3(
+	function (a, b, c) {
+		return {title: a, isoDate: b, currentTime: c};
+	});
+var _user$project$Main$init = A2(
+	_elm_lang$core$Platform_Cmd_ops['!'],
+	A3(_user$project$Main$Model, 'Timezone Manager Weekly Meeting', '2017-02-23T12:00:00Z', 0),
+	{ctor: '[]'});
+var _user$project$Main$NewDate = function (a) {
+	return {ctor: 'NewDate', _0: a};
+};
 var _user$project$Main$view = function (model) {
 	var date = function () {
-		var _p0 = _justinmimbs$elm_date_extra$Date_Extra$fromIsoString(model.isoDate);
-		if (_p0.ctor === 'Just') {
-			return _p0._0;
+		var _p1 = _justinmimbs$elm_date_extra$Date_Extra$fromIsoString(model.isoDate);
+		if (_p1.ctor === 'Just') {
+			return _p1._0;
 		} else {
 			return A7(_justinmimbs$elm_date_extra$Date_Extra$fromParts, 2017, _elm_lang$core$Date$Feb, 21, 15, 30, 0, 0);
 		}
@@ -10623,29 +10768,33 @@ var _user$project$Main$view = function (model) {
 								_1: {ctor: '[]'}
 							}
 						}),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$input,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$value(model.isoDate),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$NewDate),
+											_1: {ctor: '[]'}
+										}
+									},
+									{ctor: '[]'}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		});
 };
-var _user$project$Main$update = F2(
-	function (msg, model) {
-		var _p1 = msg;
-		return A2(
-			_elm_lang$core$Platform_Cmd_ops['!'],
-			_elm_lang$core$Native_Utils.update(
-				model,
-				{currentTime: _p1._0}),
-			{ctor: '[]'});
-	});
-var _user$project$Main$Model = F3(
-	function (a, b, c) {
-		return {title: a, isoDate: b, currentTime: c};
-	});
-var _user$project$Main$init = A2(
-	_elm_lang$core$Platform_Cmd_ops['!'],
-	A3(_user$project$Main$Model, 'Timezone Manager Weekly Meeting', '2017-02-23T12:00:00Z', 0),
-	{ctor: '[]'});
 var _user$project$Main$Tick = function (a) {
 	return {ctor: 'Tick', _0: a};
 };
