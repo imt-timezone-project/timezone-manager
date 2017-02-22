@@ -4,6 +4,7 @@ import Date exposing (Month(..), Date)
 import Date.Extra as DateExtra
 import Html
 import Html.Attributes
+import Html.Events
 import Time exposing (Time, second)
 import Utils
 
@@ -13,6 +14,7 @@ import Utils
 
 type Msg
     = Tick Time
+    | NewDate String
 
 
 type alias Model =
@@ -40,6 +42,9 @@ update msg model =
     case msg of
         Tick newTime ->
             { model | currentTime = newTime } ! []
+
+        NewDate newDate ->
+            { model | isoDate = newDate } ! []
 
 
 
@@ -99,6 +104,13 @@ view model =
                     [ Html.text
                         (DateExtra.toUtcFormattedString "EEE, MMM d, y 'at' HH:mm 'UTC'" date)
                     ]
+                ]
+            , Html.div []
+                [ Html.input
+                    [ Html.Attributes.value model.isoDate
+                    , Html.Events.onInput NewDate
+                    ]
+                    []
                 ]
             ]
 
