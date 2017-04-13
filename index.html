@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Timezone Manager</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-  </head>
-
-  <body>
-    <script src="app.js"></script>
-    <script>
-    var app = Elm.Main.fullscreen();
-    </script>
-  </body>
+<head>
+  <title></title>
+  <meta charset="utf8" />
+  <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+</head>
+<body>
+  <main></main>
+  <script>
+    var main = document.querySelector("main")
+    var app = Elm.Main.embed(main)
+  </script>
+</body>
 </html>
+
+
+
