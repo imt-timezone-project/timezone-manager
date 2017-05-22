@@ -34,8 +34,8 @@ decodeTimeZone =
         (Decode.field "countryCode" Decode.string)
         (Decode.field "countryName" Decode.string)
         (Decode.field "zoneName" Decode.string)
-        (Decode.field "Int" Decode.int)
-        (Decode.field "Int" Decode.int)
+        (Decode.field "gmtOffset" Decode.int)
+        (Decode.field "timestamp" Decode.int)
 
 
 decodeTimeZones : Decode.Decoder Timezones
@@ -57,10 +57,8 @@ uri =
 
 getTimeZoneLists : Cmd Msg
 getTimeZoneLists =
-
     Http.send UpdateTimeZones <|
         Http.get uri decodeTimeZones
-
 
 
 init : ( Model, Cmd Msg )
@@ -74,11 +72,11 @@ update msg model =
         UpdateTimeZones results ->
             case results of
                 Ok r ->
-                    (Debug.crash "Http c cool") ( { model | zones = r.zones }, Cmd.none )
+                    (Debug.log "Http c cool") ( { model | zones = r.zones }, Cmd.none )
 
                 Err err ->
-                    Debug.crash (toString err)
-                    ( model, Cmd.none )
+                    Debug.log (toString err)
+                        ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -100,4 +98,3 @@ main =
         , update = update
         , subscriptions = subscriptions
         }
-
