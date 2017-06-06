@@ -1,57 +1,100 @@
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (onInput)
+module Main exposing (..)
+
+import Html exposing (Html, text)
+import Json.Decode as Decode
+import Http
 
 
-main =
-  Html.beginnerProgram { model = model, view = view, update = update }
+type alias TimeZone =
+    { countryCode : String
+    , countryName : String
+    , zoneName : String
+    , gmtOfsset : Int
+    , timestamp : Int
+    }
 
-
--- MODEL
 
 type alias Model =
-  { name : String
-  , city : String
-  , country : String
-  }
+    { status : String
+    , message : String
+    , zones : List TimeZone
+    }
 
 
-model : Model
-model =
-  Model "" "" ""
+type alias Timezones =
+    { status : String
+    , message : String
+    , zones : List TimeZone
+    }
 
 
--- UPDATE
+decodeTimeZone : Decode.Decoder TimeZone
+decodeTimeZone =
+    Decode.map5 TimeZone
+        (Decode.field "countryCode" Decode.string)
+        (Decode.field "countryName" Decode.string)
+        (Decode.field "zoneName" Decode.string)
+        (Decode.field "gmtOffset" Decode.int)
+        (Decode.field "timestamp" Decode.int)
+
+
+decodeTimeZones : Decode.Decoder Timezones
+decodeTimeZones =
+    Decode.map3 Timezones
+        (Decode.field "status" Decode.string)
+        (Decode.field "message" Decode.string)
+        (Decode.field "zones" <| Decode.list decodeTimeZone)
+
 
 type Msg
-    = Name String
-    | City String
-    | Country String
+    = UpdateTimeZones (Result Http.Error Timezones)
 
 
-update : Msg -> Model -> Model
+uri : String
+uri =
+    "http://api.timezonedb.com/v2/list-time-zone?key=LN6172LB7WD2&format=json"
+
+
+getTimeZoneLists : Cmd Msg
+getTimeZoneLists =
+    Http.send UpdateTimeZones <|
+        Http.get uri decodeTimeZones
+
+
+init : ( Model, Cmd Msg )
+init =
+    (Debug.log "slt") ( { status = "OK", message = "", zones = [] }, getTimeZoneLists )
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-  case msg of
-    Name name ->
-      { model | name = name }
+    case msg of
+        UpdateTimeZones results ->
+            case results of
+                Ok r ->
+                    (Debug.log "Http c cool") ( { model | zones = r.zones }, Cmd.none )
 
-    City city ->
-      { model | city = city }
-
-    Country country ->
-      { model | country = country }
+                Err err ->
+                    Debug.log (toString err)
+                        ( model, Cmd.none )
 
 
--- VIEW
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
 
 view : Model -> Html Msg
 view model =
-  div []
-    [
-      div [ ] [ text "Welcome to Timezone Manager !" ]
-    , input [ type_ "text", placeholder "Name", onInput Name ] []
-    , input [ type_ "text", placeholder "City", onInput City ] []
-    , input [ type_ "text", placeholder "Country", onInput Country ] []
-    ]
+    Html.div []
+        [ Html.text (toString model) ]
 
 
+main : Program Never Model Msg
+main =
+    Html.program
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
