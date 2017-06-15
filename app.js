@@ -17071,7 +17071,6 @@ var _user$project$Main$timeZoneOption = F2(
 				return _elm_lang$core$Native_Utils.eq(_p0._0, value);
 			}
 		}();
-		var _p1 = A2(_elm_lang$core$Debug$log, 'isSelected', isSelected);
 		return A2(
 			_elm_lang$html$Html$option,
 			{
@@ -17098,6 +17097,52 @@ var _user$project$Main$title = A2(
 		ctor: '::',
 		_0: _elm_lang$html$Html$text('Timezone Manager'),
 		_1: {ctor: '[]'}
+	});
+var _user$project$Main$timeUpdate = F3(
+	function (msg, value, time) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
+			case 'Day':
+				return A2(
+					_elm_community$elm_time$Time_DateTime$setDay,
+					A2(
+						_elm_lang$core$Result$withDefault,
+						0,
+						_elm_lang$core$String$toInt(value)),
+					time);
+			case 'Month':
+				return A2(
+					_elm_community$elm_time$Time_DateTime$setMonth,
+					A2(
+						_elm_lang$core$Result$withDefault,
+						0,
+						_elm_lang$core$String$toInt(value)),
+					time);
+			case 'Year':
+				return A2(
+					_elm_community$elm_time$Time_DateTime$setYear,
+					A2(
+						_elm_lang$core$Result$withDefault,
+						0,
+						_elm_lang$core$String$toInt(value)),
+					time);
+			case 'Hour':
+				return A2(
+					_elm_community$elm_time$Time_DateTime$setHour,
+					A2(
+						_elm_lang$core$Result$withDefault,
+						0,
+						_elm_lang$core$String$toInt(value)),
+					time);
+			default:
+				return A2(
+					_elm_community$elm_time$Time_DateTime$setMinute,
+					A2(
+						_elm_lang$core$Result$withDefault,
+						0,
+						_elm_lang$core$String$toInt(value)),
+					time);
+		}
 	});
 var _user$project$Main$emptySelectValue = 'Select a timezone';
 var _user$project$Main$update = F2(
@@ -17147,7 +17192,7 @@ var _user$project$Main$update = F2(
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			default:
+			case 'RemoveTimeZone':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -17157,11 +17202,55 @@ var _user$project$Main$update = F2(
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							time: A3(_user$project$Main$timeUpdate, _p2._0, _p2._1, model.time)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
 var _user$project$Main$Model = F3(
 	function (a, b, c) {
 		return {selectedTimeZones: a, selectedTimeZone: b, time: c};
+	});
+var _user$project$Main$ChangeTime = F2(
+	function (a, b) {
+		return {ctor: 'ChangeTime', _0: a, _1: b};
+	});
+var _user$project$Main$selectValue = F4(
+	function (event, start, stop, current_value) {
+		return A2(
+			_elm_lang$html$Html$select,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onInput(
+					_user$project$Main$ChangeTime(event)),
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$List$map,
+				function (x) {
+					return A2(
+						_elm_lang$html$Html$option,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$selected(
+								_elm_lang$core$Native_Utils.eq(x, current_value)),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								_elm_lang$core$Basics$toString(x)),
+							_1: {ctor: '[]'}
+						});
+				},
+				A2(_elm_lang$core$List$range, start, stop)));
 	});
 var _user$project$Main$OnTime = function (a) {
 	return {ctor: 'OnTime', _0: a};
@@ -17388,6 +17477,73 @@ var _user$project$Main$addTimezoneForm = function (selectedTimeZone) {
 			}
 		});
 };
+var _user$project$Main$Minute = {ctor: 'Minute'};
+var _user$project$Main$Hour = {ctor: 'Hour'};
+var _user$project$Main$Year = {ctor: 'Year'};
+var _user$project$Main$Month = {ctor: 'Month'};
+var _user$project$Main$Day = {ctor: 'Day'};
+var _user$project$Main$changeTimeForm = function (time) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$h3,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Change UTC time'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A4(
+					_user$project$Main$selectValue,
+					_user$project$Main$Day,
+					1,
+					31,
+					_elm_community$elm_time$Time_DateTime$day(time)),
+				_1: {
+					ctor: '::',
+					_0: A4(
+						_user$project$Main$selectValue,
+						_user$project$Main$Month,
+						1,
+						12,
+						_elm_community$elm_time$Time_DateTime$month(time)),
+					_1: {
+						ctor: '::',
+						_0: A4(
+							_user$project$Main$selectValue,
+							_user$project$Main$Year,
+							_elm_community$elm_time$Time_DateTime$year(time),
+							_elm_community$elm_time$Time_DateTime$year(time) + 3,
+							_elm_community$elm_time$Time_DateTime$year(time)),
+						_1: {
+							ctor: '::',
+							_0: A4(
+								_user$project$Main$selectValue,
+								_user$project$Main$Hour,
+								0,
+								23,
+								_elm_community$elm_time$Time_DateTime$hour(time)),
+							_1: {
+								ctor: '::',
+								_0: A4(
+									_user$project$Main$selectValue,
+									_user$project$Main$Minute,
+									0,
+									59,
+									_elm_community$elm_time$Time_DateTime$minute(time)),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}
+		});
+};
 var _user$project$Main$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -17401,7 +17557,11 @@ var _user$project$Main$view = function (model) {
 				_1: {
 					ctor: '::',
 					_0: A2(_user$project$Main$displayTime, model.selectedTimeZones, model.time),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: _user$project$Main$changeTimeForm(model.time),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		});
