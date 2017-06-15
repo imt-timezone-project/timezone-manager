@@ -1,100 +1,106 @@
 module Main exposing (..)
 
-import Html exposing (Html, text)
-import Json.Decode as Decode
-import Http
-
-
-type alias TimeZone =
-    { countryCode : String
-    , countryName : String
-    , zoneName : String
-    , gmtOfsset : Int
-    , timestamp : Int
-    }
+import Dict
+import Html
+import Html.Attributes
+import Html.Events
+import Set
+import Time.TimeZone as TimeZone
+import Time.TimeZones as TimeZones
 
 
 type alias Model =
-    { status : String
-    , message : String
-    , zones : List TimeZone
+    { selectedTimeZones : Set.Set String
+    , selectedTimeZone : Maybe String
     }
-
-
-type alias Timezones =
-    { status : String
-    , message : String
-    , zones : List TimeZone
-    }
-
-
-decodeTimeZone : Decode.Decoder TimeZone
-decodeTimeZone =
-    Decode.map5 TimeZone
-        (Decode.field "countryCode" Decode.string)
-        (Decode.field "countryName" Decode.string)
-        (Decode.field "zoneName" Decode.string)
-        (Decode.field "gmtOffset" Decode.int)
-        (Decode.field "timestamp" Decode.int)
-
-
-decodeTimeZones : Decode.Decoder Timezones
-decodeTimeZones =
-    Decode.map3 Timezones
-        (Decode.field "status" Decode.string)
-        (Decode.field "message" Decode.string)
-        (Decode.field "zones" <| Decode.list decodeTimeZone)
 
 
 type Msg
-    = UpdateTimeZones (Result Http.Error Timezones)
+    = AddTimeZone
+    | SelectTimeZone String
 
 
-uri : String
-uri =
-    "http://api.timezonedb.com/v2/list-time-zone?key=LN6172LB7WD2&format=json"
+emptySelectValue =
+    "Select a timezone"
 
 
-getTimeZoneLists : Cmd Msg
-getTimeZoneLists =
-    Http.send UpdateTimeZones <|
-        Http.get uri decodeTimeZones
+
+-- Model
 
 
-init : ( Model, Cmd Msg )
-init =
-    (Debug.log "slt") ( { status = "OK", message = "", zones = [] }, getTimeZoneLists )
+model : Model
+model =
+    { selectedTimeZones = Set.empty
+    , selectedTimeZone = Nothing
+    }
+
+
+
+-- Update
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        UpdateTimeZones results ->
-            case results of
-                Ok r ->
-                    (Debug.log "Http c cool") ( { model | zones = r.zones }, Cmd.none )
+        AddTimeZone ->
+            case model.selectedTimeZone of
+                Nothing ->
+                    ( model, Cmd.none )
 
-                Err err ->
-                    Debug.log (toString err)
-                        ( model, Cmd.none )
+                Just name ->
+                    ( { model | selectedTimeZones = Set.insert name model.selectedTimeZones }, Cmd.none )
+
+        SelectTimeZone name ->
+            if name == emptySelectValue then
+                ( { model | selectedTimeZone = Nothing }, Cmd.none )
+            else
+                ( { model | selectedTimeZone = Just name }, Cmd.none )
 
 
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
+
+-- Views
 
 
-view : Model -> Html Msg
+title : Html.Html Msg
+title =
+    Html.h1 [] [ Html.text "Timezone Manager" ]
+
+
+timeZoneOption : String -> Html.Html Msg
+timeZoneOption value =
+    Html.option [] [ Html.text value ]
+
+
+buildTimeZonesOptions : List (Html.Html Msg)
+buildTimeZonesOptions =
+    Dict.keys TimeZones.all
+        |> List.map timeZoneOption
+
+
+addTimezoneForm : Html.Html Msg
+addTimezoneForm =
+    Html.div []
+        [ Html.select [ Html.Events.onInput SelectTimeZone ]
+            ([ Html.option [] [ Html.text emptySelectValue ] ]
+                ++ buildTimeZonesOptions
+            )
+        , Html.button [ Html.Events.onClick AddTimeZone ] [ Html.text "Add" ]
+        ]
+
+
+view : Model -> Html.Html Msg
 view model =
     Html.div []
-        [ Html.text (toString model) ]
+        [ title
+        , addTimezoneForm
+        ]
 
 
 main : Program Never Model Msg
 main =
     Html.program
-        { init = init
+        { init = ( model, Cmd.none )
         , view = view
+        , subscriptions = always Sub.none
         , update = update
-        , subscriptions = subscriptions
         }
