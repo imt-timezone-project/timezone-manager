@@ -11,7 +11,7 @@ body {
 	margin: auto;
 }
 
-h1 {
+h1, h3 {
 	margin: 30px;
 }
 
@@ -28,4 +28,16 @@ table {
 table th, table td {
     padding: 5px;
     border: 1px solid black;
+}
+
+input[type="range"] {
+	margin: 15px;
+}
+
+footer {
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    margin: 20px auto;
+    width: 500px;
 }

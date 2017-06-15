@@ -18401,9 +18401,9 @@ var _user$project$Main$timeUpdate = F3(
 		}
 	});
 var _user$project$Main$emptySelectValue = 'Select a timezone';
-var _user$project$Main$Model = F4(
-	function (a, b, c, d) {
-		return {selectedTimeZones: a, selectedTimeZone: b, time: c, todayYear: d};
+var _user$project$Main$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {selectedTimeZones: a, selectedTimeZone: b, time: c, sliderBaseTime: d, todayYear: e, sliderValue: f};
 	});
 var _user$project$Main$SliderMsg = function (a) {
 	return {ctor: 'SliderMsg', _0: a};
@@ -18472,7 +18472,9 @@ var _user$project$Main$init = {
 				})),
 		selectedTimeZone: _elm_lang$core$Maybe$Nothing,
 		time: _elm_community$elm_time$Time_DateTime$fromTimestamp(0),
-		todayYear: 0
+		todayYear: 0,
+		sliderBaseTime: _elm_community$elm_time$Time_DateTime$fromTimestamp(0),
+		sliderValue: 0
 	},
 	_1: _user$project$Main$getCurrentTime
 };
@@ -18488,6 +18490,8 @@ var _user$project$Main$update = F2(
 						model,
 						{
 							time: datetime,
+							sliderBaseTime: datetime,
+							sliderValue: 0,
 							todayYear: _elm_community$elm_time$Time_DateTime$year(datetime)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
@@ -18538,25 +18542,23 @@ var _user$project$Main$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'ChangeTime':
+				var time = A3(_user$project$Main$timeUpdate, _p2._0, _p2._1, model.time);
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{
-							time: A3(_user$project$Main$timeUpdate, _p2._0, _p2._1, model.time)
-						}),
+						{time: time, sliderValue: 0, sliderBaseTime: time}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
+				var sliderValue = _elm_lang$core$Basics$round(_p2._0);
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							time: A2(
-								_elm_community$elm_time$Time_DateTime$addSeconds,
-								_elm_lang$core$Basics$round(_p2._0),
-								model.time)
+							time: A2(_elm_community$elm_time$Time_DateTime$addMinutes, sliderValue, model.sliderBaseTime),
+							sliderValue: sliderValue
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -18760,8 +18762,8 @@ var _user$project$Main$Hour = {ctor: 'Hour'};
 var _user$project$Main$Year = {ctor: 'Year'};
 var _user$project$Main$Month = {ctor: 'Month'};
 var _user$project$Main$Day = {ctor: 'Day'};
-var _user$project$Main$changeTimeForm = F2(
-	function (time, todayYear) {
+var _user$project$Main$changeTimeForm = F3(
+	function (time, todayYear, sliderValue) {
 		return A2(
 			_elm_lang$html$Html$div,
 			{ctor: '[]'},
@@ -18843,7 +18845,8 @@ var _user$project$Main$changeTimeForm = F2(
 														_0: _debois$elm_mdl$Material_Slider$onChange(_user$project$Main$SliderMsg),
 														_1: {
 															ctor: '::',
-															_0: _debois$elm_mdl$Material_Slider$value(0),
+															_0: _debois$elm_mdl$Material_Slider$value(
+																_elm_lang$core$Basics$toFloat(sliderValue)),
 															_1: {
 																ctor: '::',
 																_0: _debois$elm_mdl$Material_Slider$max(1440),
@@ -18881,8 +18884,30 @@ var _user$project$Main$view = function (model) {
 					_0: _user$project$Main$addTimezoneForm(model.selectedTimeZone),
 					_1: {
 						ctor: '::',
-						_0: A2(_user$project$Main$changeTimeForm, model.time, model.todayYear),
-						_1: {ctor: '[]'}
+						_0: A3(_user$project$Main$changeTimeForm, model.time, model.todayYear, model.sliderValue),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$footer,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$a,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$href('https://github.com/imt-timezone-project/timezone-manager/'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Source code'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
 					}
 				}
 			}
