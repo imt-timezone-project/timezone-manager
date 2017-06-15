@@ -3,11 +3,24 @@ body {
   background: #efefef;
   padding: 10px;
   font-family: 'Varela Round';
+  font-size: 18px;
 }
 
+body {
+	width: 500px;
+	margin: auto;
+}
+
+h1 {
+	margin: 30px;
+}
+
+div {
+	text-align: center;
+}
 
 table {
-    margin: 30px; auto;
+    margin: 30px auto;
     border: 2px solid black;
 }
 

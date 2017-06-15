@@ -17553,10 +17553,10 @@ var _user$project$Main$view = function (model) {
 			_0: _user$project$Main$title,
 			_1: {
 				ctor: '::',
-				_0: _user$project$Main$addTimezoneForm(model.selectedTimeZone),
+				_0: A2(_user$project$Main$displayTime, model.selectedTimeZones, model.time),
 				_1: {
 					ctor: '::',
-					_0: A2(_user$project$Main$displayTime, model.selectedTimeZones, model.time),
+					_0: _user$project$Main$addTimezoneForm(model.selectedTimeZone),
 					_1: {
 						ctor: '::',
 						_0: _user$project$Main$changeTimeForm(model.time),
