@@ -26,6 +26,15 @@ type Msg
     | SelectTimeZone String
     | RemoveTimeZone String
     | OnTime Time
+    | ChangeTime TimeMsg String
+
+
+type TimeMsg
+    = Day
+    | Month
+    | Year
+    | Hour
+    | Minute
 
 
 emptySelectValue =
@@ -84,6 +93,28 @@ update msg model =
         RemoveTimeZone name ->
             ( { model | selectedTimeZones = Set.remove name model.selectedTimeZones }, Cmd.none )
 
+        ChangeTime event value ->
+            ( { model | time = (timeUpdate event value model.time) }, Cmd.none )
+
+
+timeUpdate : TimeMsg -> String -> DateTime.DateTime -> DateTime.DateTime
+timeUpdate msg value time =
+    case msg of
+        Day ->
+            DateTime.setDay (Result.withDefault 0 (String.toInt value)) time
+
+        Month ->
+            DateTime.setMonth (Result.withDefault 0 (String.toInt value)) time
+
+        Year ->
+            DateTime.setYear (Result.withDefault 0 (String.toInt value)) time
+
+        Hour ->
+            DateTime.setHour (Result.withDefault 0 (String.toInt value)) time
+
+        Minute ->
+            DateTime.setMinute (Result.withDefault 0 (String.toInt value)) time
+
 
 
 -- Views
@@ -108,9 +139,6 @@ timeZoneOption selected value =
 
                 Just name ->
                     name == value
-
-        _ =
-            Debug.log "isSelected" isSelected
     in
         Html.option
             [ Html.Attributes.selected isSelected
@@ -231,12 +259,42 @@ showDate datetime =
         (zfill day) ++ "/" ++ (zfill month) ++ "/" ++ (toString year) ++ " " ++ (zfill hour) ++ ":" ++ (zfill minute)
 
 
+
+-- Change Time Form
+
+
+selectValue : TimeMsg -> Int -> Int -> Int -> Html.Html Msg
+selectValue event start stop current_value =
+    List.range start stop
+        |> List.map
+            (\x ->
+                Html.option
+                    [ Html.Attributes.selected (x == current_value) ]
+                    [ Html.text <| toString x
+                    ]
+            )
+        |> Html.select [ Html.Events.onInput (ChangeTime event) ]
+
+
+changeTimeForm : DateTime.DateTime -> Html.Html Msg
+changeTimeForm time =
+    Html.div []
+        [ Html.h3 [] [ Html.text "Change UTC time" ]
+        , selectValue Day 1 31 <| DateTime.day time
+        , selectValue Month 1 12 <| DateTime.month time
+        , selectValue Year (DateTime.year time) ((DateTime.year time) + 3) <| DateTime.year time
+        , selectValue Hour 0 23 <| DateTime.hour time
+        , selectValue Minute 0 59 <| DateTime.minute time
+        ]
+
+
 view : Model -> Html.Html Msg
 view model =
     Html.div []
         [ title
         , addTimezoneForm model.selectedTimeZone
         , displayTime model.selectedTimeZones model.time
+        , changeTimeForm model.time
         ]
 
 
