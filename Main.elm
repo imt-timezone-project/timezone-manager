@@ -323,6 +323,12 @@ view model =
         , displayTime model.selectedTimeZones model.time
         , addTimezoneForm model.selectedTimeZone
         , changeTimeForm model.time model.todayYear
+        , Html.footer []
+            [ Html.a
+                [ Html.Attributes.href "https://github.com/imt-timezone-project/timezone-manager/"
+                ]
+                [ Html.text "Source code" ]
+            ]
         ]
 
 

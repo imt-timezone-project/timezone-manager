@@ -29,3 +29,11 @@ table th, table td {
     padding: 5px;
     border: 1px solid black;
 }
+
+footer {
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    margin: 20px auto;
+    width: 500px;
+}
