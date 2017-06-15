@@ -270,7 +270,7 @@ selectValue event start stop current_value =
             (\x ->
                 Html.option
                     [ Html.Attributes.selected (x == current_value) ]
-                    [ Html.text <| toString x
+                    [ Html.text <| zfill x
                     ]
             )
         |> Html.select [ Html.Events.onInput (ChangeTime event) ]
