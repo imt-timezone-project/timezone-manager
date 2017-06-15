@@ -1,0 +1,17 @@
+html,
+body {
+  background: #efefef;
+  padding: 10px;
+  font-family: 'Varela Round';
+}
+
+
+table {
+    margin: 30px; auto;
+    border: 2px solid black;
+}
+
+table th, table td {
+    padding: 5px;
+    border: 1px solid black;
+}
