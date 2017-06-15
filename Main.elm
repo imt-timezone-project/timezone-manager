@@ -19,7 +19,9 @@ type alias Model =
     { selectedTimeZones : Set.Set String
     , selectedTimeZone : Maybe String
     , time : DateTime.DateTime
+    , sliderBaseTime : DateTime.DateTime
     , todayYear : Int
+    , sliderValue : Int
     }
 
 
@@ -55,6 +57,8 @@ init =
       , selectedTimeZone = Nothing
       , time = DateTime.fromTimestamp 0
       , todayYear = 0
+      , sliderBaseTime = DateTime.fromTimestamp 0
+      , sliderValue = 0
       }
     , getCurrentTime
     )
@@ -80,6 +84,8 @@ update msg model =
             in
                 ( { model
                     | time = datetime
+                    , sliderBaseTime = datetime
+                    , sliderValue = 0
                     , todayYear = (DateTime.year datetime)
                   }
                 , Cmd.none
@@ -111,10 +117,29 @@ update msg model =
             ( { model | selectedTimeZones = Set.remove name model.selectedTimeZones }, Cmd.none )
 
         ChangeTime event value ->
-            ( { model | time = (timeUpdate event value model.time) }, Cmd.none )
+            let
+                time =
+                    (timeUpdate event value model.time)
+            in
+                ( { model
+                    | time = time
+                    , sliderValue = 0
+                    , sliderBaseTime = time
+                  }
+                , Cmd.none
+                )
 
         SliderMsg value ->
-            ( { model | time = (DateTime.addSeconds (round value) model.time) }, Cmd.none )
+            let
+                sliderValue =
+                    round value
+            in
+                ( { model
+                    | time = (DateTime.addMinutes sliderValue model.sliderBaseTime)
+                    , sliderValue = sliderValue
+                  }
+                , Cmd.none
+                )
 
 
 timeUpdate : TimeMsg -> String -> DateTime.DateTime -> DateTime.DateTime
@@ -296,8 +321,8 @@ selectValue event start stop current_value =
         |> Html.select [ Html.Events.onInput (ChangeTime event) ]
 
 
-changeTimeForm : DateTime.DateTime -> Int -> Html.Html Msg
-changeTimeForm time todayYear =
+changeTimeForm : DateTime.DateTime -> Int -> Int -> Html.Html Msg
+changeTimeForm time todayYear sliderValue =
     Html.div []
         [ Html.h3 [] [ Html.text "Change UTC time" ]
         , selectValue Day 1 31 <| DateTime.day time
@@ -309,7 +334,7 @@ changeTimeForm time todayYear =
         , Html.br [] []
         , Slider.view
             [ Slider.onChange SliderMsg
-            , Slider.value 0
+            , Slider.value <| toFloat sliderValue
             , Slider.max 1440
             , Slider.min -1440
             ]
@@ -322,7 +347,7 @@ view model =
         [ title
         , displayTime model.selectedTimeZones model.time
         , addTimezoneForm model.selectedTimeZone
-        , changeTimeForm model.time model.todayYear
+        , changeTimeForm model.time model.todayYear model.sliderValue
         , Html.footer []
             [ Html.a
                 [ Html.Attributes.href "https://github.com/imt-timezone-project/timezone-manager/"
