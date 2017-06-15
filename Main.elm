@@ -292,8 +292,8 @@ view : Model -> Html.Html Msg
 view model =
     Html.div []
         [ title
-        , addTimezoneForm model.selectedTimeZone
         , displayTime model.selectedTimeZones model.time
+        , addTimezoneForm model.selectedTimeZone
         , changeTimeForm model.time
         ]
 
