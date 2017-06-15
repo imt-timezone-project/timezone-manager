@@ -18,6 +18,7 @@ type alias Model =
     { selectedTimeZones : Set.Set String
     , selectedTimeZone : Maybe String
     , time : DateTime.DateTime
+    , todayYear : Int
     }
 
 
@@ -27,6 +28,7 @@ type Msg
     | RemoveTimeZone String
     | OnTime Time
     | ChangeTime TimeMsg String
+    | GetTime
 
 
 type TimeMsg
@@ -50,6 +52,7 @@ init =
     ( { selectedTimeZones = Set.fromList <| List.map TimeZone.name [ europe_paris (), america_new_york (), america_vancouver () ]
       , selectedTimeZone = Nothing
       , time = DateTime.fromTimestamp 0
+      , todayYear = 0
       }
     , getCurrentTime
     )
@@ -69,7 +72,19 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         OnTime time ->
-            ( { model | time = DateTime.fromTimestamp time }, Cmd.none )
+            let
+                datetime =
+                    DateTime.fromTimestamp time
+            in
+                ( { model
+                    | time = datetime
+                    , todayYear = (DateTime.year datetime)
+                  }
+                , Cmd.none
+                )
+
+        GetTime ->
+            ( model, getCurrentTime )
 
         AddTimeZone ->
             case model.selectedTimeZone of
@@ -276,15 +291,16 @@ selectValue event start stop current_value =
         |> Html.select [ Html.Events.onInput (ChangeTime event) ]
 
 
-changeTimeForm : DateTime.DateTime -> Html.Html Msg
-changeTimeForm time =
+changeTimeForm : DateTime.DateTime -> Int -> Html.Html Msg
+changeTimeForm time todayYear =
     Html.div []
         [ Html.h3 [] [ Html.text "Change UTC time" ]
         , selectValue Day 1 31 <| DateTime.day time
         , selectValue Month 1 12 <| DateTime.month time
-        , selectValue Year (DateTime.year time) ((DateTime.year time) + 3) <| DateTime.year time
+        , selectValue Year todayYear (todayYear + 3) <| DateTime.year time
         , selectValue Hour 0 23 <| DateTime.hour time
         , selectValue Minute 0 59 <| DateTime.minute time
+        , Html.button [ Html.Events.onClick GetTime ] [ Html.text "Now" ]
         ]
 
 
@@ -294,7 +310,7 @@ view model =
         [ title
         , displayTime model.selectedTimeZones model.time
         , addTimezoneForm model.selectedTimeZone
-        , changeTimeForm model.time
+        , changeTimeForm model.time model.todayYear
         ]
 
 
