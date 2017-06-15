@@ -18,6 +18,7 @@ type alias Model =
 type Msg
     = AddTimeZone
     | SelectTimeZone String
+    | RemoveTimeZone String
 
 
 emptySelectValue =
@@ -48,13 +49,21 @@ update msg model =
                     ( model, Cmd.none )
 
                 Just name ->
-                    ( { model | selectedTimeZones = Set.insert name model.selectedTimeZones }, Cmd.none )
+                    ( { model
+                        | selectedTimeZones = Set.insert name model.selectedTimeZones
+                        , selectedTimeZone = Nothing
+                      }
+                    , Cmd.none
+                    )
 
         SelectTimeZone name ->
             if name == emptySelectValue then
                 ( { model | selectedTimeZone = Nothing }, Cmd.none )
             else
                 ( { model | selectedTimeZone = Just name }, Cmd.none )
+
+        RemoveTimeZone name ->
+            ( { model | selectedTimeZones = Set.remove name model.selectedTimeZones }, Cmd.none )
 
 
 
@@ -66,32 +75,76 @@ title =
     Html.h1 [] [ Html.text "Timezone Manager" ]
 
 
-timeZoneOption : String -> Html.Html Msg
-timeZoneOption value =
-    Html.option [] [ Html.text value ]
+
+-- List
 
 
-buildTimeZonesOptions : List (Html.Html Msg)
-buildTimeZonesOptions =
+displaySelectedTimeZone : String -> Html.Html Msg
+displaySelectedTimeZone name =
+    Html.li []
+        [ Html.text name
+        , Html.button [ Html.Events.onClick (RemoveTimeZone name) ] [ Html.text "X" ]
+        ]
+
+
+displaySelectedTimeZones : Set.Set String -> Html.Html Msg
+displaySelectedTimeZones selectedTimeZones =
+    Set.toList selectedTimeZones
+        |> List.map displaySelectedTimeZone
+        |> Html.ul []
+
+
+
+-- Form
+
+
+timeZoneOption : Maybe String -> String -> Html.Html Msg
+timeZoneOption selected value =
+    let
+        isSelected =
+            case selected of
+                Nothing ->
+                    False
+
+                Just name ->
+                    name == value
+    in
+        Html.option [ Html.Attributes.selected isSelected ] [ Html.text value ]
+
+
+buildTimeZonesOptions : Maybe String -> List (Html.Html Msg)
+buildTimeZonesOptions selectedTimeZone =
     Dict.keys TimeZones.all
-        |> List.map timeZoneOption
+        |> List.map (timeZoneOption selectedTimeZone)
 
 
 addTimezoneForm : Html.Html Msg
 addTimezoneForm =
-    Html.div []
-        [ Html.select [ Html.Events.onInput SelectTimeZone ]
-            ([ Html.option [] [ Html.text emptySelectValue ] ]
-                ++ buildTimeZonesOptions
-            )
-        , Html.button [ Html.Events.onClick AddTimeZone ] [ Html.text "Add" ]
-        ]
+    let
+        emptySelected =
+            case model.selectedTimeZone of
+                Nothing ->
+                    True
+
+                Just _ ->
+                    False
+    in
+        Html.div []
+            [ Html.select
+                [ Html.Events.onInput SelectTimeZone
+                ]
+                ([ Html.option [ Html.Attributes.selected emptySelected ] [ Html.text emptySelectValue ] ]
+                    ++ buildTimeZonesOptions model.selectedTimeZone
+                )
+            , Html.button [ Html.Events.onClick AddTimeZone ] [ Html.text "Add" ]
+            ]
 
 
 view : Model -> Html.Html Msg
 view model =
     Html.div []
         [ title
+        , displaySelectedTimeZones model.selectedTimeZones
         , addTimezoneForm
         ]
 
