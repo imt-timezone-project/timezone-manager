@@ -17246,7 +17246,7 @@ var _user$project$Main$selectValue = F4(
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html$text(
-								_elm_lang$core$Basics$toString(x)),
+								_user$project$Main$zfill(x)),
 							_1: {ctor: '[]'}
 						});
 				},
