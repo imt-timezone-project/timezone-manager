@@ -12,6 +12,7 @@ import Time.TimeZone as TimeZone
 import Time.TimeZones as TimeZones
 import Time.ZonedDateTime as ZonedDateTime
 import Time.TimeZones exposing (europe_paris, america_new_york, america_vancouver)
+import Material.Slider as Slider
 
 
 type alias Model =
@@ -29,6 +30,7 @@ type Msg
     | OnTime Time
     | ChangeTime TimeMsg String
     | GetTime
+    | SliderMsg Float
 
 
 type TimeMsg
@@ -110,6 +112,9 @@ update msg model =
 
         ChangeTime event value ->
             ( { model | time = (timeUpdate event value model.time) }, Cmd.none )
+
+        SliderMsg value ->
+            ( { model | time = (DateTime.addSeconds (round value) model.time) }, Cmd.none )
 
 
 timeUpdate : TimeMsg -> String -> DateTime.DateTime -> DateTime.DateTime
@@ -301,6 +306,13 @@ changeTimeForm time todayYear =
         , selectValue Hour 0 23 <| DateTime.hour time
         , selectValue Minute 0 59 <| DateTime.minute time
         , Html.button [ Html.Events.onClick GetTime ] [ Html.text "Now" ]
+        , Html.br [] []
+        , Slider.view
+            [ Slider.onChange SliderMsg
+            , Slider.value 0
+            , Slider.max 1440
+            , Slider.min -1440
+            ]
         ]
 
 
