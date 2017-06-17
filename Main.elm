@@ -4,7 +4,7 @@ import Dict
 import Html
 import Html.Attributes
 import Html.Events
-import Set
+import Dict
 import Task
 import Time exposing (Time)
 import Time.DateTime as DateTime
@@ -15,9 +15,18 @@ import Time.TimeZones exposing (europe_paris, america_new_york, america_vancouve
 import Material.Slider as Slider
 
 
+type alias ParticipantName =
+    String
+
+
+type alias TimeZoneName =
+    String
+
+
 type alias Model =
-    { selectedTimeZones : Set.Set String
-    , selectedTimeZone : Maybe String
+    { participants : Dict.Dict ParticipantName TimeZoneName
+    , participantName : Maybe ParticipantName
+    , selectedTimeZone : Maybe TimeZoneName
     , time : DateTime.DateTime
     , sliderBaseTime : DateTime.DateTime
     , todayYear : Int
@@ -27,8 +36,9 @@ type alias Model =
 
 type Msg
     = AddTimeZone
-    | SelectTimeZone String
-    | RemoveTimeZone String
+    | ParticipantName ParticipantName
+    | SelectTimeZone TimeZoneName
+    | RemoveParticipant TimeZoneName
     | OnTime Time
     | ChangeTime TimeMsg String
     | GetTime
@@ -53,7 +63,8 @@ emptySelectValue =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { selectedTimeZones = Set.fromList <| List.map TimeZone.name [ europe_paris (), america_new_york (), america_vancouver () ]
+    ( { participants = Dict.fromList <| List.map2 (,) [ "Thomas", "Ethan", "Benson" ] (List.map TimeZone.name [ europe_paris (), america_new_york (), america_vancouver () ])
+      , participantName = Nothing
       , selectedTimeZone = Nothing
       , time = DateTime.fromTimestamp 0
       , todayYear = 0
@@ -95,17 +106,25 @@ update msg model =
             ( model, getCurrentTime )
 
         AddTimeZone ->
-            case model.selectedTimeZone of
+            case model.participants of
                 Nothing ->
                     ( model, Cmd.none )
 
-                Just name ->
-                    ( { model
-                        | selectedTimeZones = Set.insert name model.selectedTimeZones
-                        , selectedTimeZone = Nothing
-                      }
-                    , Cmd.none
-                    )
+                Just timezoneName ->
+                    case model.participantName of
+                        Nothing ->
+                            ( model, Cmd.none )
+
+                        Just participantName ->
+                            ( { model
+                                | participants = Dict.insert participantName timezoneName model.participants
+                                , selectedTimeZone = Nothing
+                              }
+                            , Cmd.none
+                            )
+
+        ParticipantName name ->
+            ( { model | participantName = Just name }, Cmd.none )
 
         SelectTimeZone name ->
             if name == emptySelectValue then
@@ -113,8 +132,8 @@ update msg model =
             else
                 ( { model | selectedTimeZone = Just name }, Cmd.none )
 
-        RemoveTimeZone name ->
-            ( { model | selectedTimeZones = Set.remove name model.selectedTimeZones }, Cmd.none )
+        RemoveParticipant name ->
+            ( { model | participants = Dict.remove name model.participants }, Cmd.none )
 
         ChangeTime event value ->
             let
@@ -227,8 +246,8 @@ addTimezoneForm selectedTimeZone =
 -- Table
 
 
-getTime : DateTime.DateTime -> String -> Html.Html Msg
-getTime currentTime timeZone =
+getTime : DateTime.DateTime -> ( ParticipantName, TimeZoneName ) -> Html.Html Msg
+getTime currentTime ( participantName, timeZone ) =
     let
         timezone =
             TimeZones.fromName timeZone
@@ -253,19 +272,19 @@ getTime currentTime timeZone =
         Html.tr []
             [ Html.td [] [ Html.text timeZone ]
             , Html.td [] [ Html.abbr [ Html.Attributes.title iso8601 ] [ Html.text time ] ]
-            , Html.td [] [ Html.a [ Html.Attributes.href "#", Html.Events.onClick (RemoveTimeZone timeZone) ] [ Html.text "X" ] ]
+            , Html.td [] [ Html.a [ Html.Attributes.href "#", Html.Events.onClick (RemoveParticipant participantName) ] [ Html.text "X" ] ]
             ]
 
 
-displayTime : Set.Set String -> DateTime.DateTime -> Html.Html Msg
-displayTime selectedTimeZones currentTime =
+displayTime : Dict.Dict ParticipantName TimeZoneName -> DateTime.DateTime -> Html.Html Msg
+displayTime participants currentTime =
     Html.table []
         ([ Html.tr []
             [ Html.th [] [ Html.text "TimeZone" ]
             , Html.th [] [ Html.text "Time" ]
             ]
          ]
-            ++ (Set.toList selectedTimeZones
+            ++ (Dict.values participants
                     |> List.map (getTime currentTime)
                )
         )
@@ -345,8 +364,8 @@ view : Model -> Html.Html Msg
 view model =
     Html.div []
         [ title
-        , displayTime model.selectedTimeZones model.time
-        , addTimezoneForm model.selectedTimeZone
+        , displayTime model.participants model.time
+        , addTimezoneForm model.participants
         , changeTimeForm model.time model.todayYear model.sliderValue
         , Html.footer []
             [ Html.a
